@@ -1,0 +1,2806 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>StudyPal | Dashboard</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+```
+
+</head>
+
+<body>
+
+```
+<style>
+
+    /* =====================================================
+       DASHBOARD REMINDER TOOLS
+    ====================================================== */
+
+    .dashboard-reminder-tools {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin: 0 0 18px;
+        padding: 14px 16px;
+        background: #f5f7ff;
+        border: 1px solid #e4e7f5;
+        border-radius: 14px;
+    }
+
+    .dashboard-reminder-tools strong {
+        display: block;
+        margin-bottom: 3px;
+        color: var(--text);
+        font-size: 12px;
+    }
+
+    .dashboard-reminder-tools span {
+        color: var(--text-soft);
+        font-size: 11px;
+    }
+
+    .dashboard-notification-button {
+        flex-shrink: 0;
+        padding: 9px 13px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: white;
+        color: var(--text);
+        font-size: 10px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .dashboard-notification-button:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .today-reminder {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 8px;
+        padding: 5px 8px;
+        background: #fff8e9;
+        border-radius: 7px;
+        color: #8b651e;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .today-reminder.off {
+        background: #f5f5f8;
+        color: var(--text-muted);
+    }
+
+
+    /* =====================================================
+       SMALL ACHIEVEMENTS
+    ====================================================== */
+
+    .achievements-section {
+        margin-top: 28px;
+    }
+
+    .achievements-card {
+        background: #fffdf8;
+        border: 1px solid rgba(75, 93, 115, 0.12);
+        border-radius: 22px;
+        padding: 26px;
+        box-shadow: 0 10px 30px rgba(60, 72, 88, 0.06);
+    }
+
+    .achievements-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .achievements-header h2 {
+        margin: 5px 0 4px;
+    }
+
+    .achievements-header p {
+        margin: 0;
+        color: var(--text-muted);
+    }
+
+    .achievement-count {
+        font-weight: 700;
+        color: #4b5d73;
+        background: #eef3f6;
+        border-radius: 999px;
+        padding: 8px 13px;
+        white-space: nowrap;
+    }
+
+    .achievement-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 14px;
+    }
+
+    .achievement-card {
+        min-height: 150px;
+        border-radius: 17px;
+        padding: 18px 14px;
+        border: 1px solid rgba(75, 93, 115, 0.10);
+        background: #f7f8f6;
+        text-align: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .achievement-card.unlocked {
+        background: #f2f6f3;
+        border-color: rgba(94, 122, 105, 0.22);
+    }
+
+    .achievement-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(60, 72, 88, 0.08);
+    }
+
+    .achievement-icon {
+        width: 52px;
+        height: 52px;
+        margin: 0 auto 11px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+        background: #e8edf0;
+        filter: grayscale(1);
+        opacity: 0.65;
+    }
+
+    .achievement-card.unlocked .achievement-icon {
+        background: #e8f0e9;
+        filter: none;
+        opacity: 1;
+    }
+
+    .achievement-title {
+        display: block;
+        font-weight: 700;
+        color: var(--text);
+        font-size: 14px;
+        line-height: 1.3;
+    }
+
+    .achievement-description {
+        display: block;
+        margin-top: 6px;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .achievement-status {
+        display: inline-block;
+        margin-top: 10px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .achievement-card.locked .achievement-status {
+        color: #8c9298;
+    }
+
+    .achievement-card.unlocked .achievement-status {
+        color: #58745f;
+    }
+
+    @media (max-width: 900px) {
+
+        .achievement-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+    }
+
+    @media (max-width: 600px) {
+
+        .achievement-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .achievements-card {
+            padding: 18px;
+        }
+
+        .achievements-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .dashboard-reminder-tools {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .dashboard-notification-button {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+
+<!-- =====================================================
+     NAVIGATION
+====================================================== -->
+
+<nav class="navbar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            ✦
+        </div>
+
+        <span>
+            StudyPal
+        </span>
+
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="/" class="active">
+            Dashboard
+        </a>
+
+        <a href="/plans">
+            My Plans
+        </a>
+
+        <a href="/analytics">
+            Analytics
+        </a>
+
+    </div>
+
+
+    <div class="nav-badge">
+        AI Study Planner
+    </div>
+
+</nav>
+
+
+
+<!-- =====================================================
+     MAIN DASHBOARD
+====================================================== -->
+
+<main class="dashboard">
+
+
+    <!-- =================================================
+         WELCOME SECTION
+    ================================================== -->
+
+    <section class="welcome-section">
+
+        <div class="welcome-content">
+
+            <span class="welcome-label">
+                ✦ YOUR STUDY SPACE
+            </span>
+
+
+            <h1>
+                Plan your preparation.<br>
+
+                <span>
+                    Study with purpose.
+                </span>
+
+            </h1>
+
+
+            <p>
+                Create a personalized study plan based on your
+                subjects, exam date, available study time, and
+                difficulty level.
+            </p>
+
+        </div>
+
+
+        <div class="welcome-decoration"></div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         QUICK STATS
+    ================================================== -->
+
+    <section class="stats-grid">
+
+
+        <!-- STUDY PLANS -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📚
+            </div>
+
+            <span class="stat-label">
+                Study Plans
+            </span>
+
+            <span class="stat-value">
+                {{ total_plans }}
+            </span>
+
+            <span class="stat-description">
+                Plans created so far
+            </span>
+
+        </div>
+
+
+
+        <!-- PLANNED HOURS -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                ⏱
+            </div>
+
+            <span class="stat-label">
+                Planned Hours
+            </span>
+
+            <span class="stat-value">
+                {{ total_planned_hours }}
+            </span>
+
+            <span class="stat-description">
+                Total study time planned
+            </span>
+
+        </div>
+
+
+
+        <!-- COMPLETED TASKS -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                ✅
+            </div>
+
+            <span class="stat-label">
+                Completed Tasks
+            </span>
+
+            <span class="stat-value">
+                {{ completed_tasks }}
+            </span>
+
+            <span class="stat-description">
+                Tasks completed
+            </span>
+
+        </div>
+
+
+
+        <!-- COMPLETION -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🎯
+            </div>
+
+            <span class="stat-label">
+                Completion
+            </span>
+
+            <span class="stat-value">
+                {{ completion_rate }}%
+            </span>
+
+            <span class="stat-description">
+                Overall task completion
+            </span>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         STUDY STREAK
+    ================================================== -->
+
+    <section class="study-streak-section">
+
+        <div class="study-streak-card">
+
+
+            <!-- STREAK HEADER -->
+
+            <div class="streak-header">
+
+                <div>
+
+                    <span class="section-label">
+                        YOUR STUDY CONSISTENCY
+                    </span>
+
+                    <h2>
+                        🔥 {{ study_streak }} Day Streak
+                    </h2>
+
+                    <p>
+                        Keep showing up and build your study habit.
+                    </p>
+
+                </div>
+
+
+                <div class="streak-fire">
+                    🔥
+                </div>
+
+            </div>
+
+
+
+            <!-- WEEKLY CALENDAR -->
+
+            <div class="streak-week">
+
+                {% for day in weekly_study_days %}
+
+                    <div class="streak-day
+                        {% if day.completed %}
+                            streak-completed
+                        {% endif %}">
+
+                        <span class="streak-day-name">
+                            {{ day.day }}
+                        </span>
+
+                        <div class="streak-day-circle">
+
+                            {% if day.completed %}
+                                ✓
+                            {% else %}
+                                —
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         DAILY STUDY GOAL
+    ================================================== -->
+
+    <section class="daily-goal-section">
+
+        <div class="daily-goal-card">
+
+
+            <!-- DAILY GOAL HEADER -->
+
+            <div class="daily-goal-header">
+
+                <div class="daily-goal-title">
+
+                    <div class="daily-goal-icon">
+                        🎯
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Daily Study Goal
+                        </h2>
+
+                        <p>
+                            Stay consistent with your daily target.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="daily-goal-value">
+
+                    <strong>
+                        {{ today_actual_hours }} / {{ daily_goal }} hrs
+                    </strong>
+
+                    <span>
+                        studied today
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- DAILY GOAL PROGRESS -->
+
+            <div class="daily-goal-progress">
+
+                <div class="daily-goal-progress-bar">
+
+                    <div
+                        class="daily-goal-progress-fill"
+                        style="width: {{ daily_goal_percentage }}%;"
+                    ></div>
+
+                </div>
+
+
+                <div class="daily-goal-details">
+
+                    <span>
+                        {{ daily_goal_percentage }}% completed
+                    </span>
+
+
+                    {% if remaining_goal_hours > 0 %}
+
+                        <span>
+                            {{ remaining_goal_hours }} hrs remaining
+                        </span>
+
+                    {% else %}
+
+                        <span>
+                            🎉 Daily goal reached!
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- UPDATE DAILY GOAL -->
+
+            <form
+                class="daily-goal-form"
+                action="/update-daily-goal"
+                method="POST"
+            >
+
+                <input
+                    type="number"
+                    name="daily_goal"
+                    value="{{ daily_goal }}"
+                    min="0.5"
+                    max="24"
+                    step="0.5"
+                    required
+                >
+
+                <span>
+                    hours
+                </span>
+
+                <button type="submit">
+                    Update Goal
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         STUDY REMINDERS
+    ================================================== -->
+
+    <section class="dashboard-reminder-tools">
+
+        <div>
+
+            <strong>
+                🔔 Study Reminders
+            </strong>
+
+            <span>
+                Set reminders from your Study Plan and receive
+                browser notifications while StudyPal is open.
+            </span>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="dashboard-notification-button"
+            id="dashboardNotificationButton"
+            onclick="enableDashboardNotifications()"
+        >
+            🔔 Enable Notifications
+        </button>
+
+    </section>
+
+
+
+    <!-- =================================================
+         SMALL ACHIEVEMENTS
+    ================================================== -->
+
+    <section class="achievements-section">
+
+        <div class="achievements-card">
+
+
+            <div class="achievements-header">
+
+                <div>
+
+                    <span class="section-label">
+                        SMALL WINS
+                    </span>
+
+                    <h2>
+                        🏆 Achievements
+                    </h2>
+
+                    <p>
+                        Little milestones that celebrate your progress.
+                    </p>
+
+                </div>
+
+
+                <span class="achievement-count">
+
+                    {{ achievements | selectattr("unlocked") | list | length }}
+                    /
+                    {{ achievements | length }}
+                    unlocked
+
+                </span>
+
+            </div>
+
+
+            <div class="achievement-grid">
+
+                {% for achievement in achievements %}
+
+                    <div class="achievement-card
+                        {% if achievement.unlocked %}
+                            unlocked
+                        {% else %}
+                            locked
+                        {% endif %}">
+
+                        <div class="achievement-icon">
+                            {{ achievement.icon }}
+                        </div>
+
+                        <span class="achievement-title">
+                            {{ achievement.title }}
+                        </span>
+
+                        <span class="achievement-description">
+                            {{ achievement.description }}
+                        </span>
+
+                        <span class="achievement-status">
+
+                            {% if achievement.unlocked %}
+
+                                ✓ Unlocked
+
+                            {% else %}
+
+                                🔒 Locked
+
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         TODAY'S TASKS
+    ================================================== -->
+
+    <section class="today-section">
+
+
+        <div class="today-header">
+
+            <div>
+
+                <span class="section-label">
+                    YOUR STUDY PLAN
+                </span>
+
+
+                <h2>
+                    📅 Today's Tasks
+                </h2>
+
+
+                {% if today_day %}
+
+                    <p>
+                        Day {{ today_day }} of your study plan
+                    </p>
+
+                {% else %}
+
+                    <p>
+                        Create a study plan to see today's tasks.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            {% if today_total > 0 %}
+
+                <div class="today-progress">
+
+                    <strong>
+                        {{ today_completed }} / {{ today_total }}
+                    </strong>
+
+                    <span>
+                        completed
+                    </span>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- =================================================
+             TODAY'S TASK LIST
+        ================================================== -->
+
+        {% if today_tasks %}
+
+            <div class="today-task-list">
+
+                {% for task in today_tasks %}
+
+                    <div class="today-task-card
+                        {% if task.completed == 1 %}
+                            task-completed
+                        {% endif %}">
+
+
+                        <!-- CHECKBOX -->
+
+                        <div class="today-task-check">
+
+                            <input
+                                type="checkbox"
+
+                                {% if task.completed == 1 %}
+                                    checked
+                                {% endif %}
+
+                                onchange="updateTodayTask(
+                                    {{ task.task_id }},
+                                    this.checked
+                                )"
+                            >
+
+                        </div>
+
+
+
+                        <!-- TASK INFORMATION -->
+
+                        <div class="today-task-content">
+
+
+                            <div class="today-task-top">
+
+                                <span class="today-subject">
+                                    {{ task.subject }}
+                                </span>
+
+                                <span class="today-hours">
+                                    ⏱ {{ task.planned_hours }} hrs
+                                </span>
+
+                            </div>
+
+
+                            <h3>
+                                {{ task.task_type }}
+                            </h3>
+
+
+                            <p>
+                                {{ task.description }}
+                            </p>
+
+
+                            <span class="today-confidence">
+                                Confidence: {{ task.confidence }}
+                            </span>
+
+
+                            {% if task.reminder_enabled and task.reminder_time %}
+
+                                <span class="today-reminder">
+
+                                    🔔 {{ task.reminder_time }}
+
+                                    {% if task.start_time and task.end_time %}
+
+                                        · {{ task.start_time }}–{{ task.end_time }}
+
+                                    {% endif %}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="today-reminder off">
+                                    🔕 No reminder set
+                                </span>
+
+                            {% endif %}
+
+
+
+                            <!-- START STUDYING BUTTON -->
+
+                            <button
+                                type="button"
+                                class="start-timer-button"
+
+                                onclick="startStudyTimer(
+                                    {{ task.task_id }},
+                                    '{{ task.subject | e }}',
+                                    '{{ task.task_type | e }}'
+                                )"
+                            >
+
+                                ▶ Start Studying
+
+                            </button>
+
+
+
+                            <!-- =================================================
+                                 MY NOTES
+                            ================================================== -->
+
+                            <div class="today-task-notes">
+
+                                <label
+                                    for="today-notes-{{ task.task_id }}"
+                                    class="today-notes-label"
+                                >
+                                    📝 My Notes
+                                </label>
+
+
+                                <textarea
+                                    id="today-notes-{{ task.task_id }}"
+                                    class="today-notes-input"
+                                    placeholder="Write something about this task..."
+                                >{{ task.notes }}</textarea>
+
+
+                                <div class="today-notes-actions">
+
+                                    <button
+                                        type="button"
+                                        class="today-save-note-button"
+
+                                        onclick="saveTodayTaskNote(
+                                            {{ task.task_id }}
+                                        )"
+                                    >
+                                        Save Note
+                                    </button>
+
+
+                                    <span
+                                        id="today-note-status-{{ task.task_id }}"
+                                        class="today-note-status"
+                                    ></span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+
+            <!-- =================================================
+                 NO TASKS
+            ================================================== -->
+
+            <div class="no-today-tasks">
+
+                <div class="no-task-icon">
+                    📚
+                </div>
+
+                <h3>
+                    No tasks for today
+                </h3>
+
+                <p>
+                    Create a study plan to start your daily tasks.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             I'M BEHIND
+        ================================================== -->
+
+        <div class="behind-study-action">
+
+            <button
+                type="button"
+                class="behind-study-button"
+                onclick="handleMissedDay()"
+            >
+                😓 I'm Behind
+            </button>
+
+
+            <span
+                id="behind-status"
+                class="behind-status"
+            ></span>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         SUBJECT PROGRESS
+    ====================================================== -->
+
+    <section class="subject-progress-section">
+
+
+        <div class="subject-progress-header">
+
+            <div>
+
+                <p class="section-label">
+                    PROGRESS
+                </p>
+
+                <h2>
+                    Subject Progress
+                </h2>
+
+                <p class="subject-progress-subtitle">
+                    Track your progress across each subject.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        {% if subject_progress %}
+
+            <div class="subject-progress-grid">
+
+                {% for subject in subject_progress %}
+
+                    <div class="subject-progress-card">
+
+
+                        <div class="subject-progress-top">
+
+                            <div>
+
+                                <h3>
+                                    {{ subject.subject }}
+                                </h3>
+
+                                <p>
+                                    {{ subject.completed_tasks }}
+                                    /
+                                    {{ subject.total_tasks }}
+                                    tasks completed
+                                </p>
+
+                            </div>
+
+
+                            <div class="subject-progress-percentage">
+                                {{ subject.percentage }}%
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- PROGRESS BAR -->
+
+                        <div class="subject-progress-bar">
+
+                            <div
+                                class="subject-progress-fill"
+                                style="width: {{ subject.percentage }}%;"
+                            ></div>
+
+                        </div>
+
+
+
+                        <!-- HOURS -->
+
+                        <div class="subject-progress-hours">
+
+                            <span>
+                                Planned:
+                                <strong>
+                                    {{ subject.planned_hours }} hrs
+                                </strong>
+                            </span>
+
+
+                            <span>
+                                Actual:
+                                <strong>
+                                    {{ subject.actual_hours }} hrs
+                                </strong>
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+            <div class="subject-progress-empty">
+
+                <p>
+                    No subject progress available yet.
+                </p>
+
+                <span>
+                    Generate a study plan to start tracking your subjects.
+                </span>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- =================================================
+         STUDY TIMER
+    ================================================== -->
+
+    <section
+        id="studyTimerBox"
+        class="study-timer-box"
+        style="display: none;"
+    >
+
+        <div class="timer-header">
+
+            <div>
+
+                <span class="section-label">
+                    STUDY SESSION
+                </span>
+
+            </div>
+
+
+            <button
+                type="button"
+                onclick="closeTimer()"
+                class="timer-close"
+                aria-label="Close timer"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        <div class="timer-content">
+
+            <div class="timer-icon">
+                ⏱️
+            </div>
+
+
+            <h2 id="timerTaskName">
+                Study Session
+            </h2>
+
+
+            <p id="timerSubject">
+                Subject
+            </p>
+
+
+            <!-- TIMER -->
+
+            <div
+                id="timerDisplay"
+                class="timer-display"
+            >
+                00:00:00
+            </div>
+
+
+            <!-- TIMER STATUS -->
+
+            <div
+                id="timerStatus"
+                class="timer-status"
+            >
+                Study session in progress
+            </div>
+
+
+            <!-- TIMER BUTTONS -->
+
+            <div class="timer-buttons">
+
+                <button
+                    type="button"
+                    id="pauseTimerButton"
+                    onclick="pauseStudyTimer()"
+                    class="timer-button"
+                >
+                    ⏸ Pause
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="finishStudyTimer()"
+                    class="timer-button finish"
+                >
+                    ⏹ Finish
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         DASHBOARD CONTENT
+    ================================================== -->
+
+    <section class="dashboard-grid">
+
+
+        <!-- =================================================
+             CREATE STUDY PLAN
+        ================================================== -->
+
+        <div class="dashboard-card planner-section">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>
+                        Create a Study Plan
+                    </h2>
+
+                    <p>
+                        Start by telling us about your preparation.
+                    </p>
+
+                </div>
+
+
+                <div class="card-icon">
+                    📝
+                </div>
+
+            </div>
+
+
+            <div class="planner-card">
+
+                <form
+                    action="/generate"
+                    method="POST"
+                >
+
+
+                    <!-- SUBJECTS -->
+
+                    <div class="form-group full-width">
+
+                        <label for="subjects">
+                            Subjects
+                        </label>
+
+                        <span class="field-hint">
+                            Add the subjects you need to prepare.
+                        </span>
+
+
+                        <div class="input-wrapper">
+
+                            <span class="input-icon">
+                                📚
+                            </span>
+
+
+                            <input
+                                id="subjects"
+                                type="text"
+                                name="subjects"
+                                placeholder="Java, DBMS, Computer Networks"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- FORM GRID -->
+
+                    <div class="form-grid">
+
+
+                        <!-- EXAM DATE -->
+
+                        <div class="form-group">
+
+                            <label for="exam_date">
+                                Exam Date
+                            </label>
+
+                            <span class="field-hint">
+                                When is your exam?
+                            </span>
+
+
+                            <div class="input-wrapper">
+
+                                <span class="input-icon">
+                                    📅
+                                </span>
+
+
+                                <input
+                                    id="exam_date"
+                                    type="date"
+                                    name="exam_date"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- DAILY STUDY HOURS -->
+
+                        <div class="form-group">
+
+                            <label for="study_hours">
+                                Daily Study Hours
+                            </label>
+
+                            <span class="field-hint">
+                                How much time can you study?
+                            </span>
+
+
+                            <div class="input-wrapper">
+
+                                <span class="input-icon">
+                                    ⏱
+                                </span>
+
+
+                                <input
+                                    id="study_hours"
+                                    type="number"
+                                    name="study_hours"
+                                    placeholder="Example: 4"
+                                    min="1"
+                                    max="24"
+                                    required
+                                >
+
+
+                                <span class="input-suffix">
+                                    hrs
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- DIFFICULTY -->
+
+                        <div class="form-group">
+
+                            <label for="difficulty">
+                                Difficulty Level
+                            </label>
+
+                            <span class="field-hint">
+                                How challenging are your subjects?
+                            </span>
+
+
+                            <div class="input-wrapper">
+
+                                <span class="input-icon">
+                                    ◈
+                                </span>
+
+
+                                <select
+                                    id="difficulty"
+                                    name="difficulty"
+                                >
+
+                                    <option value="Easy">
+                                        Easy
+                                    </option>
+
+                                    <option
+                                        value="Medium"
+                                        selected
+                                    >
+                                        Medium
+                                    </option>
+
+                                    <option value="Hard">
+                                        Hard
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PLANNER FOOTER -->
+
+                    <div class="planner-footer">
+
+                        <div class="footer-info">
+
+                            <span class="info-icon">
+                                ✦
+                            </span>
+
+                            <span>
+                                Your plan will be organized around
+                                your exam timeline.
+                            </span>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                        >
+
+                            <span>
+                                Generate Study Plan
+                            </span>
+
+                            <span class="button-arrow">
+                                →
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             HOW STUDYPAL HELPS
+        ================================================== -->
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>
+                        How StudyPal Helps
+                    </h2>
+
+                    <p>
+                        Your preparation, organized.
+                    </p>
+
+                </div>
+
+
+                <div class="card-icon">
+                    ✦
+                </div>
+
+            </div>
+
+
+            <div class="feature-list">
+
+
+                <!-- FEATURE 1 -->
+
+                <div class="feature-item">
+
+                    <div class="feature-icon">
+                        🧠
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Smart Scheduling
+                        </strong>
+
+                        <span>
+                            Tasks are organized according to
+                            your exam timeline and difficulty.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- FEATURE 2 -->
+
+                <div class="feature-item">
+
+                    <div class="feature-icon">
+                        📋
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Structured Tasks
+                        </strong>
+
+                        <span>
+                            Learn concepts, practice questions,
+                            and revise important topics.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- FEATURE 3 -->
+
+                <div class="feature-item">
+
+                    <div class="feature-icon">
+                        🎯
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Confidence Tracking
+                        </strong>
+
+                        <span>
+                            Adjust your confidence and focus
+                            more on topics that need attention.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- FEATURE 4 -->
+
+                <div class="feature-item">
+
+                    <div class="feature-icon">
+                        📊
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Progress Tracking
+                        </strong>
+
+                        <span>
+                            Compare planned study time with
+                            your actual study time.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- FEATURE 5 -->
+
+                <div class="feature-item">
+
+                    <div class="feature-icon">
+                        ⏱️
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Task-Based Study Timer
+                        </strong>
+
+                        <span>
+                            Track the actual time you spend
+                            studying each task.
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         QUICK ACCESS
+    ================================================== -->
+
+    <section class="quick-access">
+
+        <div class="quick-access-card">
+
+            <div class="quick-icon">
+                ↗
+            </div>
+
+
+            <div class="quick-content">
+
+                <strong>
+                    Continue your preparation
+                </strong>
+
+                <p>
+                    View your previously created plans and
+                    continue where you left off.
+                </p>
+
+            </div>
+
+
+            <a
+                href="/plans"
+                class="secondary-button"
+            >
+
+                View My Plans
+
+                <span>
+                    →
+                </span>
+
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+
+<!-- =====================================================
+     FOOTER
+====================================================== -->
+
+<footer class="site-footer">
+
+    <span>
+        StudyPal
+    </span>
+
+    <span>
+        Personalized study planning
+    </span>
+
+</footer>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+====================================================== -->
+
+<script>
+
+
+    // =================================================
+    // STUDY REMINDERS / BROWSER NOTIFICATIONS
+    // =================================================
+
+    function enableDashboardNotifications() {
+
+        if (!("Notification" in window)) {
+
+            alert(
+                "This browser does not support notifications."
+            );
+
+            return;
+        }
+
+
+        Notification.requestPermission().then(
+            function(permission) {
+
+                const button =
+                    document.getElementById(
+                        "dashboardNotificationButton"
+                    );
+
+
+                if (permission === "granted") {
+
+                    localStorage.setItem(
+                        "studypal_notifications_enabled",
+                        "true"
+                    );
+
+
+                    if (button) {
+
+                        button.textContent =
+                            "🔔 Notifications Enabled";
+
+                    }
+
+
+                    checkDashboardReminders();
+
+                }
+
+
+                else if (permission === "denied") {
+
+                    if (button) {
+
+                        button.textContent =
+                            "🔕 Notifications Blocked";
+
+                    }
+
+
+                    alert(
+                        "Notifications are blocked. Please allow them " +
+                        "for StudyPal in your browser settings."
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+
+    function updateDashboardNotificationButton() {
+
+        const button =
+            document.getElementById(
+                "dashboardNotificationButton"
+            );
+
+
+        if (
+            !button ||
+            !("Notification" in window)
+        ) {
+
+            return;
+
+        }
+
+
+        if (Notification.permission === "granted") {
+
+            button.textContent =
+                "🔔 Notifications Enabled";
+
+        }
+
+
+        else if (Notification.permission === "denied") {
+
+            button.textContent =
+                "🔕 Notifications Blocked";
+
+        }
+
+    }
+
+
+
+    function dashboardTimeText(value) {
+
+        if (!value) {
+            return "";
+        }
+
+
+        const parts = value.split(":");
+
+        let hour =
+            parseInt(parts[0], 10);
+
+        const minute =
+            parts[1];
+
+
+        const suffix =
+            hour >= 12 ? "PM" : "AM";
+
+
+        hour =
+            hour % 12;
+
+
+        if (hour === 0) {
+            hour = 12;
+        }
+
+
+        return (
+            hour +
+            ":" +
+            minute +
+            " " +
+            suffix
+        );
+
+    }
+
+
+
+    function checkDashboardReminders() {
+
+        if (!("Notification" in window)) {
+            return;
+        }
+
+
+        if (Notification.permission !== "granted") {
+            return;
+        }
+
+
+        const now = new Date();
+
+
+        const currentTime =
+            String(
+                now.getHours()
+            ).padStart(2, "0") +
+            ":" +
+            String(
+                now.getMinutes()
+            ).padStart(2, "0");
+
+
+        const todayKey =
+            now.getFullYear() +
+            "-" +
+            String(
+                now.getMonth() + 1
+            ).padStart(2, "0") +
+            "-" +
+            String(
+                now.getDate()
+            ).padStart(2, "0");
+
+
+        const reminderElements =
+            document.querySelectorAll(
+                ".today-reminder:not(.off)"
+            );
+
+
+        reminderElements.forEach(
+            function(element) {
+
+                const text =
+                    element.textContent.trim();
+
+
+                const match =
+                    text.match(
+                        /(\d{1,2}:\d{2})/
+                    );
+
+
+                if (!match) {
+                    return;
+                }
+
+
+                let reminderTime =
+                    match[1];
+
+
+                const timeParts =
+                    reminderTime.split(":");
+
+
+                let hour =
+                    parseInt(
+                        timeParts[0],
+                        10
+                    );
+
+
+                const minute =
+                    timeParts[1];
+
+
+                reminderTime =
+                    String(hour).padStart(
+                        2,
+                        "0"
+                    ) +
+                    ":" +
+                    minute;
+
+
+                if (
+                    reminderTime !==
+                    currentTime
+                ) {
+
+                    return;
+
+                }
+
+
+                const card =
+                    element.closest(
+                        ".today-task-card"
+                    );
+
+
+                const subjectElement =
+                    card
+                        ? card.querySelector(
+                            ".today-subject"
+                        )
+                        : null;
+
+
+                const taskElement =
+                    card
+                        ? card.querySelector("h3")
+                        : null;
+
+
+                const subject =
+                    subjectElement
+                        ? subjectElement.textContent.trim()
+                        : "your study task";
+
+
+                const taskType =
+                    taskElement
+                        ? taskElement.textContent.trim()
+                        : "Study session";
+
+
+                const storageKey =
+                    "studypal_dashboard_reminder_" +
+                    subject +
+                    "_" +
+                    taskType +
+                    "_" +
+                    todayKey +
+                    "_" +
+                    currentTime;
+
+
+                if (
+                    localStorage.getItem(
+                        storageKey
+                    ) === "sent"
+                ) {
+
+                    return;
+
+                }
+
+
+                let body =
+                    "Time to study " +
+                    subject +
+                    " — " +
+                    taskType +
+                    ".";
+
+
+                const rangeText =
+                    text.match(
+                        /·\s*([^\n]+)/
+                    );
+
+
+                if (rangeText) {
+
+                    body =
+                        "You planned " +
+                        subject +
+                        " from " +
+                        rangeText[1].trim() +
+                        ".";
+
+                }
+
+
+                new Notification(
+                    "🔔 Study reminder",
+                    {
+                        body: body,
+                        tag:
+                            "studypal-dashboard-" +
+                            subject +
+                            "-" +
+                            todayKey
+                    }
+                );
+
+
+                localStorage.setItem(
+                    storageKey,
+                    "sent"
+                );
+
+            }
+        );
+
+    }
+
+
+    updateDashboardNotificationButton();
+
+    checkDashboardReminders();
+
+    setInterval(
+        checkDashboardReminders,
+        15000
+    );
+
+
+
+    // =================================================
+    // TODAY'S TASK CHECKBOX
+    // =================================================
+
+    function updateTodayTask(
+        taskId,
+        completed
+    ) {
+
+        fetch(
+            "/update-task",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded"
+                },
+
+                body:
+                    "task_id=" +
+                    encodeURIComponent(taskId) +
+                    "&completed=" +
+                    (completed ? 1 : 0)
+            }
+        )
+
+        .then(
+            response =>
+                response.text()
+        )
+
+        .then(
+            data => {
+
+                if (data === "success") {
+
+                    location.reload();
+
+                }
+
+            }
+        );
+
+    }
+
+
+
+    // =================================================
+    // SAVE TODAY'S TASK NOTE
+    // =================================================
+
+    function saveTodayTaskNote(taskId) {
+
+        const notesInput =
+            document.getElementById(
+                "today-notes-" + taskId
+            );
+
+
+        const status =
+            document.getElementById(
+                "today-note-status-" + taskId
+            );
+
+
+        const notes =
+            notesInput.value;
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "task_id",
+            taskId
+        );
+
+
+        formData.append(
+            "notes",
+            notes
+        );
+
+
+        fetch(
+            "/save-note",
+            {
+                method: "POST",
+                body: formData
+            }
+        )
+
+        .then(
+            response =>
+                response.text()
+        )
+
+        .then(
+            data => {
+
+                if (data === "success") {
+
+                    status.textContent =
+                        "Saved ✓";
+
+
+                    setTimeout(
+                        function() {
+
+                            status.textContent =
+                                "";
+
+                        },
+                        2000
+                    );
+
+                }
+
+                else {
+
+                    status.textContent =
+                        "Could not save";
+
+                }
+
+            }
+        )
+
+        .catch(
+            error => {
+
+                console.error(
+                    "Error saving note:",
+                    error
+                );
+
+
+                status.textContent =
+                    "Could not save";
+
+            }
+        );
+
+    }
+
+
+
+    // =================================================
+    // STUDY TIMER VARIABLES
+    // =================================================
+
+    let timerInterval = null;
+
+    let timerSeconds = 0;
+
+    let timerRunning = false;
+
+    let currentTaskId = null;
+
+
+
+    // =================================================
+    // START STUDY TIMER
+    // =================================================
+
+    function startStudyTimer(
+        taskId,
+        subject,
+        taskType
+    ) {
+
+        clearInterval(timerInterval);
+
+
+        currentTaskId =
+            taskId;
+
+
+        timerSeconds =
+            0;
+
+
+        timerRunning =
+            true;
+
+
+        document.getElementById(
+            "timerTaskName"
+        ).textContent =
+            taskType;
+
+
+        document.getElementById(
+            "timerSubject"
+        ).textContent =
+            subject +
+            " — Study Session";
+
+
+        document.getElementById(
+            "pauseTimerButton"
+        ).textContent =
+            "⏸ Pause";
+
+
+        document.getElementById(
+            "timerStatus"
+        ).textContent =
+            "Study session in progress";
+
+
+        document.getElementById(
+            "studyTimerBox"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "studyTimerBox"
+        ).scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+
+        updateTimerDisplay();
+
+
+        timerInterval =
+            setInterval(
+                function() {
+
+                    if (timerRunning) {
+
+                        timerSeconds++;
+
+                        updateTimerDisplay();
+
+                    }
+
+                },
+                1000
+            );
+
+    }
+
+
+
+    // =================================================
+    // UPDATE TIMER DISPLAY
+    // =================================================
+
+    function updateTimerDisplay() {
+
+        let hours =
+            Math.floor(
+                timerSeconds / 3600
+            );
+
+
+        let minutes =
+            Math.floor(
+                (timerSeconds % 3600) / 60
+            );
+
+
+        let seconds =
+            timerSeconds % 60;
+
+
+        hours =
+            String(hours)
+                .padStart(2, "0");
+
+
+        minutes =
+            String(minutes)
+                .padStart(2, "0");
+
+
+        seconds =
+            String(seconds)
+                .padStart(2, "0");
+
+
+        document.getElementById(
+            "timerDisplay"
+        ).textContent =
+            hours +
+            ":" +
+            minutes +
+            ":" +
+            seconds;
+
+    }
+
+
+
+    // =================================================
+    // PAUSE / RESUME TIMER
+    // =================================================
+
+    function pauseStudyTimer() {
+
+        if (!currentTaskId) {
+            return;
+        }
+
+
+        timerRunning =
+            !timerRunning;
+
+
+        const button =
+            document.getElementById(
+                "pauseTimerButton"
+            );
+
+
+        const status =
+            document.getElementById(
+                "timerStatus"
+            );
+
+
+        if (timerRunning) {
+
+            button.textContent =
+                "⏸ Pause";
+
+            status.textContent =
+                "Study session in progress";
+
+        }
+
+        else {
+
+            button.textContent =
+                "▶ Resume";
+
+            status.textContent =
+                "Timer paused";
+
+        }
+
+    }
+
+
+
+    // =================================================
+    // FINISH STUDY TIMER
+    // =================================================
+
+    function finishStudyTimer() {
+
+        if (!currentTaskId) {
+            return;
+        }
+
+
+        if (timerSeconds <= 0) {
+
+            alert(
+                "Study for at least a few seconds before finishing."
+            );
+
+            return;
+
+        }
+
+
+        const confirmed =
+            confirm(
+                "Finish this study session and save your study time?"
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        clearInterval(timerInterval);
+
+        timerRunning =
+            false;
+
+
+        const finishButton =
+            document.querySelector(
+                ".timer-button.finish"
+            );
+
+
+        finishButton.disabled =
+            true;
+
+
+        finishButton.textContent =
+            "Saving...";
+
+
+        fetch(
+            "/save-timer",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded"
+                },
+
+                body:
+                    "task_id=" +
+                    encodeURIComponent(
+                        currentTaskId
+                    ) +
+                    "&seconds=" +
+                    encodeURIComponent(
+                        timerSeconds
+                    )
+            }
+        )
+
+        .then(
+            response =>
+                response.text()
+        )
+
+        .then(
+            data => {
+
+                if (data === "success") {
+
+                    alert(
+                        "Study session saved successfully! 🎉"
+                    );
+
+                    location.reload();
+
+                }
+
+                else {
+
+                    finishButton.disabled =
+                        false;
+
+                    finishButton.textContent =
+                        "⏹ Finish";
+
+                    alert(
+                        "Unable to save study session."
+                    );
+
+                }
+
+            }
+        )
+
+        .catch(
+            error => {
+
+                console.error(
+                    "Timer error:",
+                    error
+                );
+
+
+                finishButton.disabled =
+                    false;
+
+
+                finishButton.textContent =
+                    "⏹ Finish";
+
+
+                alert(
+                    "Something went wrong while saving the study session."
+                );
+
+            }
+        );
+
+    }
+
+
+
+    // =================================================
+    // CLOSE TIMER
+    // =================================================
+
+    function closeTimer() {
+
+        if (
+            timerRunning &&
+            timerSeconds > 0
+        ) {
+
+            const confirmClose =
+                confirm(
+                    "Your timer is still running. Close it without saving?"
+                );
+
+
+            if (!confirmClose) {
+                return;
+            }
+
+        }
+
+
+        clearInterval(timerInterval);
+
+
+        timerRunning =
+            false;
+
+
+        timerSeconds =
+            0;
+
+
+        currentTaskId =
+            null;
+
+
+        document.getElementById(
+            "studyTimerBox"
+        ).style.display =
+            "none";
+
+
+        updateTimerDisplay();
+
+    }
+
+
+
+    // =================================================
+    // PREVENT ACCIDENTAL PAGE LEAVE WHILE TIMER RUNS
+    // =================================================
+
+    window.addEventListener(
+        "beforeunload",
+        function(event) {
+
+            if (
+                timerRunning &&
+                timerSeconds > 0
+            ) {
+
+                event.preventDefault();
+
+                event.returnValue = "";
+
+            }
+
+        }
+    );
+
+
+
+    // =================================================
+    // I'M BEHIND / MISSED DAY
+    // =================================================
+
+    function handleMissedDay() {
+
+        const confirmMove =
+            confirm(
+                "You haven't finished today's tasks.\n\n" +
+                "StudyPal will redistribute your unfinished tasks " +
+                "across the remaining days.\n\n" +
+                "Do you want to continue?"
+            );
+
+
+        if (!confirmMove) {
+            return;
+        }
+
+
+        const status =
+            document.getElementById(
+                "behind-status"
+            );
+
+
+        status.textContent =
+            "Redistributing tasks...";
+
+
+        fetch(
+            "/missed-day",
+            {
+                method: "POST"
+            }
+        )
+
+        .then(
+            response =>
+                response.text()
+        )
+
+        .then(
+            data => {
+
+                if (data === "success") {
+
+                    status.textContent =
+                        "Tasks redistributed ✓";
+
+
+                    setTimeout(
+                        function() {
+
+                            window.location.reload();
+
+                        },
+                        1000
+                    );
+
+                }
+
+                else if (
+                    data === "nothing_to_move"
+                ) {
+
+                    status.textContent =
+                        "No unfinished tasks to move.";
+
+                }
+
+                else if (
+                    data === "no_remaining_days"
+                ) {
+
+                    status.textContent =
+                        "There are no remaining days.";
+
+                }
+
+                else if (
+                    data === "no_active_day"
+                ) {
+
+                    status.textContent =
+                        "Today's plan is not active.";
+
+                }
+
+                else if (
+                    data === "no_plan"
+                ) {
+
+                    status.textContent =
+                        "No study plan found.";
+
+                }
+
+                else {
+
+                    status.textContent =
+                        "Something went wrong.";
+
+                }
+
+            }
+        )
+
+        .catch(
+            function(error) {
+
+                console.error(
+                    "Missed day error:",
+                    error
+                );
+
+
+                status.textContent =
+                    "Unable to redistribute tasks.";
+
+            }
+        );
+
+    }
+
+</script>
+```
+
+</body>
+
+</html>

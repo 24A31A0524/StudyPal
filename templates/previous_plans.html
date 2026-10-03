@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>My Plans | StudyPal</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+
+    .plans-page {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .plans-header {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .plans-header h1 {
+        margin-bottom: 8px;
+    }
+
+    .plans-header p {
+        color: #666;
+    }
+
+    .plans-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .plan-card {
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #eeeeee;
+    }
+
+    .plan-card h2 {
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+
+    .plan-info {
+        display: grid;
+        grid-template-columns:
+            repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .info-box {
+        background: #f7f8fa;
+        padding: 12px;
+        border-radius: 10px;
+    }
+
+    .info-label {
+        display: block;
+        font-size: 12px;
+        color: #777;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        font-weight: bold;
+    }
+
+    .open-plan-btn {
+        display: inline-block;
+        padding: 11px 18px;
+        background: #1f3c88;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+
+    .open-plan-btn:hover {
+        opacity: 0.9;
+    }
+
+    .empty-plans {
+        text-align: center;
+        background: white;
+        padding: 50px 20px;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-plans h2 {
+        margin-bottom: 10px;
+    }
+
+    .empty-plans p {
+        color: #666;
+        margin-bottom: 20px;
+    }
+
+    .new-plan-btn {
+        display: inline-block;
+        padding: 11px 20px;
+        background: #1f3c88;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #1f3c88;
+        text-decoration: none;
+    }
+
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<div class="plans-page">
+
+    <a href="/" class="home-link">
+    🏠
+    <span>Home</span>
+</a>
+
+    <div class="plans-header">
+
+        <h1>📚 My Study Plans</h1>
+
+        <p>
+            View and continue your previously created study plans.
+        </p>
+
+    </div>
+
+
+    {% if plans %}
+
+        <div class="plans-list">
+
+            {% for plan in plans %}
+
+                <div class="plan-card">
+
+                    <h2>
+                        📖 Study Plan #{{ plan[0] }}
+                    </h2>
+
+
+                    <div class="plan-info">
+
+                        <div class="info-box">
+
+                            <span class="info-label">
+                                Exam Date
+                            </span>
+
+                            <span class="info-value">
+                                {{ plan[1] }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="info-box">
+
+                            <span class="info-label">
+                                Daily Study Hours
+                            </span>
+
+                            <span class="info-value">
+                                {{ plan[2] }} hours
+                            </span>
+
+                        </div>
+
+
+                        <div class="info-box">
+
+                            <span class="info-label">
+                                Difficulty
+                            </span>
+
+                            <span class="info-value">
+                                {{ plan[3] }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="info-box">
+
+                            <span class="info-label">
+                                Days Remaining
+                            </span>
+
+                            <span class="info-value">
+                                {{ plan[4] }} days
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <a href="{{ url_for(
+                        'open_plan',
+                        plan_id=plan[0]
+                    ) }}"
+                       class="open-plan-btn">
+
+                        Open Study Plan →
+
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-plans">
+
+            <h2>No Study Plans Yet 📚</h2>
+
+            <p>
+                You haven't created a study plan yet.
+            </p>
+
+            <a href="{{ url_for('home') }}"
+               class="new-plan-btn">
+
+                Create Your First Plan
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+</body>
+
+</html>

@@ -1,0 +1,330 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Study Analytics | StudyPal</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="analytics-container">
+
+    <!-- HEADER -->
+
+    <div class="analytics-header">
+
+        <div>
+
+            <p class="analytics-label">
+                STUDYPAL • ANALYTICS
+            </p>
+
+            <h1>📊 Study Analytics</h1>
+
+            <p class="analytics-subtitle">
+                Track your study performance and progress.
+            </p>
+
+        </div>
+
+        <div class="analytics-icon">
+            📈
+        </div>
+
+    </div>
+
+
+    <!-- SUMMARY CARDS -->
+
+    <div class="analytics-stats">
+
+        <div class="analytics-card planned-card">
+
+            <div class="analytics-card-icon">
+                ⏰
+            </div>
+
+            <div>
+
+                <p class="analytics-card-title">
+                    Planned Hours
+                </p>
+
+                <h2>
+                    {{ total_planned }}
+                </h2>
+
+                <span>hours scheduled</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="analytics-card actual-card">
+
+            <div class="analytics-card-icon">
+                ⏱️
+            </div>
+
+            <div>
+
+                <p class="analytics-card-title">
+                    Actual Hours
+                </p>
+
+                <h2>
+                    {{ total_actual }}
+                </h2>
+
+                <span>hours studied</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="analytics-card completed-card">
+
+            <div class="analytics-card-icon">
+                ✅
+            </div>
+
+            <div>
+
+                <p class="analytics-card-title">
+                    Completed Tasks
+                </p>
+
+                <h2>
+                    {{ completed_tasks }}
+                    <small>/ {{ total_tasks }}</small>
+                </h2>
+
+                <span>tasks completed</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="analytics-card progress-card">
+
+            <div class="analytics-card-icon">
+                📈
+            </div>
+
+            <div>
+
+                <p class="analytics-card-title">
+                    Completion
+                </p>
+
+                <h2>
+                    {{ completion_percentage }}%
+                </h2>
+
+                <span>overall progress</span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PROGRESS -->
+
+    <div class="analytics-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="section-label">
+                    OVERALL PROGRESS
+                </p>
+
+                <h2>
+                    Your study progress
+                </h2>
+
+            </div>
+
+            <strong>
+                {{ completion_percentage }}%
+            </strong>
+
+        </div>
+
+
+        <div class="progress-background">
+
+            <div class="progress-fill"
+                 style="width: {{ completion_percentage }}%;">
+            </div>
+
+        </div>
+
+        <p class="progress-text">
+            {{ completed_tasks }} of {{ total_tasks }}
+            tasks completed
+        </p>
+
+    </div>
+
+
+    <!-- SUBJECT PERFORMANCE -->
+
+    <div class="analytics-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="section-label">
+                    SUBJECTS
+                </p>
+
+                <h2>
+                    📚 Subject Performance
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        {% if subject_stats %}
+
+        <div class="subject-grid">
+
+            {% for subject in subject_stats %}
+
+            <div class="subject-card">
+
+                <div class="subject-card-header">
+
+                    <div class="subject-icon">
+                        📖
+                    </div>
+
+                    <h3>
+                        {{ subject[0] }}
+                    </h3>
+
+                </div>
+
+
+                <div class="subject-details">
+
+                    <div class="subject-detail">
+
+                        <span>
+                            Planned
+                        </span>
+
+                        <strong>
+                            {{ "%.1f"|format(subject[1]) }} hrs
+                        </strong>
+
+                    </div>
+
+
+                    <div class="subject-detail">
+
+                        <span>
+                            Actual
+                        </span>
+
+                        <strong>
+                            {{ "%.1f"|format(subject[2]) }} hrs
+                        </strong>
+
+                    </div>
+
+
+                    <div class="subject-detail">
+
+                        <span>
+                            Tasks
+                        </span>
+
+                        <strong>
+                            {{ subject[4] }} / {{ subject[3] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                {% if subject[3] > 0 %}
+
+                <div class="subject-progress">
+
+                    <div class="subject-progress-fill"
+                         style="width: {{ (subject[4] / subject[3] * 100)|round }}%;">
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <div>
+                📚
+            </div>
+
+            <h3>
+                No study data yet
+            </h3>
+
+            <p>
+                Create a study plan and start completing tasks
+                to see your analytics here.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- BUTTON -->
+
+    <div class="analytics-footer">
+
+        <a href="/" class="new-plan-button">
+            ← Create New Plan
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
+

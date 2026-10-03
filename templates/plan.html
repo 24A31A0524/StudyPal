@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Study Plan - StudyPal</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        /* =====================================================
+           STUDY PLAN PAGE
+        ===================================================== */
+
+        .plans-page {
+            min-height: 100vh;
+            background: #f5f6fa;
+        }
+
+        .plans-navbar {
+            height: 68px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .plans-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #1f2937;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .plans-brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            background: #1f3c88;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .plans-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .plans-nav-link {
+            color: #667085;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .plans-nav-link:hover {
+            color: #1f3c88;
+        }
+
+        .plans-nav-badge {
+            padding: 7px 12px;
+            border-radius: 20px;
+            background: #eef3ff;
+            color: #1f3c88;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .plans-container {
+            width: 88%;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 45px 0 60px;
+        }
+
+        .plans-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .plans-header-label {
+            margin: 0 0 8px;
+            color: #1f3c88;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+        }
+
+        .plans-header h1 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 40px;
+            line-height: 1.15;
+        }
+
+        .plans-header p {
+            margin: 10px 0 0;
+            color: #667085;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .notification-button {
+            border: 1px solid #dfe5f4;
+            background: white;
+            color: #1f3c88;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            transition: 0.2s ease;
+        }
+
+        .notification-button:hover {
+            background: #eef3ff;
+            border-color: #1f3c88;
+        }
+
+
+        /* =====================================================
+           SUMMARY
+        ===================================================== */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 24px;
+        }
+
+        .summary-box {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 4px 15px rgba(31, 60, 136, 0.04);
+            transition: 0.2s ease;
+        }
+
+        .summary-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(31, 60, 136, 0.07);
+        }
+
+        .summary-label {
+            color: #98a2b3;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            color: #1f2937;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+
+        /* =====================================================
+           PROGRESS
+        ===================================================== */
+
+        .plan-progress-section {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(31, 60, 136, 0.04);
+        }
+
+        .progress-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .progress-title {
+            color: #1f2937;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .progress-percentage {
+            color: #1f3c88;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 9px;
+            background: #edf0f5;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #1f3c88;
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+
+        /* =====================================================
+           ADAPTIVE STUDY PLAN
+        ===================================================== */
+
+        .adaptive-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px 22px;
+            background: #f5f7ff;
+            border: 1px solid #dfe5f4;
+            border-radius: 17px;
+            box-shadow: 0 4px 15px rgba(31, 60, 136, 0.04);
+        }
+
+        .adaptive-content {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .adaptive-icon {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eef3ff;
+            border-radius: 11px;
+            font-size: 20px;
+        }
+
+        .adaptive-text h3 {
+            margin: 0 0 5px;
+            color: #1f2937;
+            font-size: 14px;
+        }
+
+        .adaptive-text p {
+            margin: 0;
+            color: #667085;
+            font-size: 11px;
+            line-height: 1.55;
+        }
+
+        .adaptive-action {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .adaptive-button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 9px;
+            background: #1f3c88;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 14px rgba(31, 60, 136, 0.15);
+            transition: 0.2s ease;
+        }
+
+        .adaptive-button:hover {
+            background: #17316f;
+            transform: translateY(-1px);
+        }
+
+        .adaptive-button:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .adaptive-status {
+            color: #2f7d32;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           STUDY DAYS
+        ===================================================== */
+
+        .study-days {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .study-day {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 17px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(31, 60, 136, 0.04);
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 18px 22px;
+            background: #f8f9fc;
+            border-bottom: 1px solid #e8ebf1;
+        }
+
+        .day-title {
+            margin: 0;
+            color: #1f2937;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .day-label {
+            color: #667085;
+            font-size: 11px;
+        }
+
+        .day-tasks {
+            padding: 0 22px;
+        }
+
+        .task {
+            padding: 22px 0;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .task:last-child {
+            border-bottom: none;
+        }
+
+        .task-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+        }
+
+        .task-checkbox {
+            width: 19px;
+            height: 19px;
+            margin-top: 2px;
+            accent-color: #1f3c88;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .task-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-title-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 7px;
+        }
+
+        .task-subject {
+            color: #1f2937;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .task-type {
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: #eef3ff;
+            color: #1f3c88;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .task-description {
+            margin: 0;
+            color: #667085;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .task-meta-item {
+            padding: 5px 9px;
+            border-radius: 7px;
+            background: #f5f6fa;
+            color: #667085;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .task-reason {
+            margin-top: 10px;
+            color: #7b8494;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           CONFIDENCE
+        ===================================================== */
+
+        .confidence-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 13px;
+        }
+
+        .confidence-area label {
+            color: #667085;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .confidence-select {
+            border: 1px solid #dfe5f4;
+            background: white;
+            color: #1f2937;
+            border-radius: 7px;
+            padding: 6px 8px;
+            font-size: 10px;
+            outline: none;
+        }
+
+        .confidence-select:focus {
+            border-color: #1f3c88;
+        }
+
+
+        /* =====================================================
+           ACTUAL HOURS
+        ===================================================== */
+
+        .actual-hours-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 13px;
+        }
+
+        .actual-hours-area label {
+            color: #667085;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .actual-hours-input {
+            width: 75px;
+            padding: 6px 8px;
+            border: 1px solid #dfe5f4;
+            border-radius: 7px;
+            font-size: 10px;
+            outline: none;
+        }
+
+        .actual-hours-input:focus {
+            border-color: #1f3c88;
+        }
+
+
+        /* =====================================================
+           REMINDER
+        ===================================================== */
+
+        .reminder-section {
+            margin-top: 15px;
+            padding: 13px;
+            background: #f8f9fc;
+            border-radius: 10px;
+        }
+
+        .reminder-title {
+            margin-bottom: 9px;
+            color: #667085;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .reminder-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .reminder-field input[type="time"] {
+            width: 100%;
+            padding: 7px 8px;
+            border: 1px solid #dfe5f4;
+            border-radius: 7px;
+            font-size: 10px;
+            outline: none;
+        }
+
+        .reminder-field input[type="time"]:focus {
+            border-color: #1f3c88;
+        }
+
+        .save-reminder-button {
+            padding: 8px 11px;
+            border: none;
+            border-radius: 7px;
+            background: #1f3c88;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .save-reminder-button:hover {
+            background: #17316f;
+        }
+
+
+        /* =====================================================
+           NOTES
+        ===================================================== */
+
+        .task-notes {
+            margin-top: 14px;
+        }
+
+        .task-notes textarea {
+            width: 100%;
+            min-height: 65px;
+            padding: 9px 10px;
+            border: 1px solid #dfe5f4;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10px;
+            outline: none;
+        }
+
+        .task-notes textarea:focus {
+            border-color: #1f3c88;
+        }
+
+        .save-note-button {
+            margin-top: 7px;
+            padding: 7px 11px;
+            border: none;
+            border-radius: 7px;
+            background: #eef3ff;
+            color: #1f3c88;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .save-note-button:hover {
+            background: #dfe8ff;
+        }
+
+
+        /* =====================================================
+           ACTION BUTTONS
+        ===================================================== */
+
+        .plan-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .analytics-button,
+        .new-plan-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 11px 18px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            transition: 0.2s ease;
+        }
+
+        .analytics-button {
+            background: #eef3ff;
+            color: #1f3c88;
+            border: 1px solid #dfe5f4;
+        }
+
+        .analytics-button:hover {
+            background: #dfe8ff;
+        }
+
+        .new-plan-button {
+            background: #1f3c88;
+            color: white;
+            border: 1px solid #1f3c88;
+        }
+
+        .new-plan-button:hover {
+            background: #17316f;
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 850px) {
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .plans-header h1 {
+                font-size: 34px;
+            }
+
+            .plans-navbar {
+                padding: 0 4%;
+            }
+
+            .plans-nav-right {
+                gap: 14px;
+            }
+
+            .adaptive-section {
+                align-items: stretch;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .adaptive-action {
+                width: 100%;
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .adaptive-button {
+                width: 100%;
+            }
+
+            .adaptive-status {
+                text-align: center;
+            }
+        }
+
+
+        @media (max-width: 600px) {
+
+            .plans-navbar {
+                height: auto;
+                padding: 15px 5%;
+                flex-direction: column;
+                gap: 13px;
+            }
+
+            .plans-nav-right {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .plans-container {
+                width: 90%;
+                padding: 30px 0 45px;
+            }
+
+            .plans-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .plans-header h1 {
+                font-size: 30px;
+            }
+
+            .plans-header p {
+                font-size: 13px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .day-header {
+                padding: 15px;
+            }
+
+            .day-tasks {
+                padding: 0 15px;
+            }
+
+            .task {
+                padding: 18px 0;
+            }
+
+            .actual-hours-area {
+                flex-wrap: wrap;
+            }
+
+            .confidence-area {
+                flex-wrap: wrap;
+            }
+
+            .reminder-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .save-reminder-button {
+                width: 100%;
+            }
+
+            .plan-actions {
+                flex-direction: column;
+            }
+
+            .analytics-button,
+            .new-plan-button {
+                width: 100%;
+            }
+
+            .adaptive-section {
+                padding: 17px;
+            }
+
+            .adaptive-content {
+                align-items: flex-start;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="plans-page">
+
+
+    <!-- =====================================================
+         NAVBAR
+    ====================================================== -->
+
+    <nav class="plans-navbar">
+
+        <a href="/" class="plans-brand">
+
+            <span class="plans-brand-icon">
+                S
+            </span>
+
+            <span>
+                StudyPal
+            </span>
+
+        </a>
+
+
+        <div class="plans-nav-right">
+
+            <a href="/" class="plans-nav-link">
+                Dashboard
+            </a>
+
+            <a href="/plans" class="plans-nav-link">
+                My Plans
+            </a>
+
+            <span class="plans-nav-badge">
+                Current Plan
+            </span>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="plans-container">
+
+
+        <!-- HEADER -->
+
+        <div class="plans-header">
+
+            <div>
+
+                <p class="plans-header-label">
+                    YOUR PERSONALIZED PLAN
+                </p>
+
+                <h1>
+                    Your Study Plan
+                </h1>
+
+                <p>
+                    A structured study schedule designed around your
+                    exam, subjects, available time, and learning needs.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="notification-button"
+                onclick="requestNotifications()"
+            >
+                🔔 Enable Notifications
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             SUMMARY
+        ================================================== -->
+
+        <div class="summary-grid">
+
+
+            <div class="summary-box">
+
+                <div class="summary-label">
+                    Exam Date
+                </div>
+
+                <div class="summary-value">
+
+                    {% if plan is defined %}
+                        {{ plan.exam_date }}
+                    {% else %}
+                        {{ exam_date }}
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-box">
+
+                <div class="summary-label">
+                    Days Remaining
+                </div>
+
+                <div class="summary-value">
+
+                    {% if plan is defined %}
+                        {{ plan.days_left }}
+                    {% else %}
+                        {{ days_left }}
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-box">
+
+                <div class="summary-label">
+                    Daily Study
+                </div>
+
+                <div class="summary-value">
+
+                    {% if plan is defined %}
+                        {{ plan.study_hours }} hrs
+                    {% else %}
+                        {{ study_hours }} hrs
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-box">
+
+                <div class="summary-label">
+                    Difficulty
+                </div>
+
+                <div class="summary-value">
+
+                    {% if plan is defined %}
+                        {{ plan.difficulty }}
+                    {% else %}
+                        {{ difficulty }}
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PROGRESS
+        ================================================== -->
+
+        <section class="plan-progress-section">
+
+            <div class="progress-top">
+
+                <span class="progress-title">
+                    Overall Progress
+                </span>
+
+                <span
+                    class="progress-percentage"
+                    id="progressPercentage"
+                >
+                    0%
+                </span>
+
+            </div>
+
+
+            <div class="progress-track">
+
+                <div
+                    class="progress-bar"
+                    id="progressBar"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ADAPTIVE STUDY PLAN
+        ================================================== -->
+
+        <section class="adaptive-section">
+
+
+            <div class="adaptive-content">
+
+                <div class="adaptive-icon">
+                    🔄
+                </div>
+
+
+                <div class="adaptive-text">
+
+                    <h3>
+                        Adaptive Study Plan
+                    </h3>
+
+                    <p>
+                        Fell behind or your study pace changed?
+                        Redistribute unfinished tasks across your
+                        remaining study days.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="adaptive-action">
+
+                <button
+                    type="button"
+                    class="adaptive-button"
+                    onclick="adjustStudyPlan()"
+                >
+                    🔄 Adjust My Plan
+                </button>
+
+
+                <span
+                    id="adaptive-status"
+                    class="adaptive-status"
+                ></span>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             STUDY DAYS
+        ================================================== -->
+
+        <div class="study-days">
+
+            {% for day in study_plan %}
+
+            <section class="study-day">
+
+
+                <div class="day-header">
+
+                    <div>
+
+                        <h2 class="day-title">
+                            Day {{ day.day }}
+                        </h2>
+
+                        <span class="day-label">
+                            Your scheduled study tasks
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="day-tasks">
+
+
+                    {% for task in day.tasks %}
+
+                    <div class="task">
+
+
+                        <div class="task-top">
+
+
+                            <input
+                                type="checkbox"
+                                class="task-checkbox"
+                                data-task-id="{{ task.id }}"
+                                {% if task.completed == 1 %}checked{% endif %}
+                                onchange="updateTask(this)"
+                            >
+
+
+                            <div class="task-main">
+
+
+                                <div class="task-title-row">
+
+                                    <span class="task-subject">
+                                        {{ task.subject }}
+                                    </span>
+
+
+                                    {% if task.task_type %}
+
+                                    <span class="task-type">
+                                        {{ task.task_type }}
+                                    </span>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                {% if task.description %}
+
+                                <p class="task-description">
+                                    {{ task.description }}
+                                </p>
+
+                                {% endif %}
+
+
+                                <div class="task-meta">
+
+                                    <span class="task-meta-item">
+                                        Planned:
+                                        {{ task.hours or task.planned_hours or 0 }}
+                                        hrs
+                                    </span>
+
+
+                                    <span class="task-meta-item">
+                                        Actual:
+                                        {{ task.actual_hours or 0 }}
+                                        hrs
+                                    </span>
+
+                                </div>
+
+
+                                {% if task.reason %}
+
+                                <div class="task-reason">
+                                    💡 {{ task.reason }}
+                                </div>
+
+                                {% endif %}
+
+
+                                <!-- CONFIDENCE -->
+
+                                <div class="confidence-area">
+
+                                    <label>
+                                        Confidence:
+                                    </label>
+
+
+                                    <select
+                                        class="confidence-select"
+                                        data-task-id="{{ task.id }}"
+                                        onchange="updateConfidence(this)"
+                                    >
+
+                                        <option
+                                            value="Low"
+                                            {% if task.confidence == "Low" %}
+                                                selected
+                                            {% endif %}
+                                        >
+                                            Low
+                                        </option>
+
+
+                                        <option
+                                            value="Medium"
+                                            {% if task.confidence == "Medium" or not task.confidence %}
+                                                selected
+                                            {% endif %}
+                                        >
+                                            Medium
+                                        </option>
+
+
+                                        <option
+                                            value="High"
+                                            {% if task.confidence == "High" %}
+                                                selected
+                                            {% endif %}
+                                        >
+                                            High
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <!-- ACTUAL HOURS -->
+
+                                <div class="actual-hours-area">
+
+                                    <label>
+                                        Actual Hours:
+                                    </label>
+
+
+                                    <input
+                                        type="number"
+                                        class="actual-hours-input"
+                                        min="0"
+                                        step="0.1"
+                                        value="{{ task.actual_hours or 0 }}"
+                                        data-task-id="{{ task.id }}"
+                                        onchange="updateActualHours(this)"
+                                    >
+
+                                </div>
+
+
+                                <!-- REMINDER -->
+
+                                <div class="reminder-section">
+
+                                    <div class="reminder-title">
+                                        ⏰ Task Reminder
+                                    </div>
+
+
+                                    <div class="reminder-fields">
+
+
+                                        <div class="reminder-field">
+
+                                            <input
+                                                type="time"
+                                                id="start-time-{{ task.id }}"
+                                                value="{{ task.start_time or '' }}"
+                                            >
+
+                                        </div>
+
+
+                                        <div class="reminder-field">
+
+                                            <input
+                                                type="time"
+                                                id="reminder-time-{{ task.id }}"
+                                                value="{{ task.reminder_time or '' }}"
+                                            >
+
+                                        </div>
+
+
+                                        <button
+                                            type="button"
+                                            class="save-reminder-button"
+                                            onclick="saveReminder({{ task.id }})"
+                                        >
+                                            Save Reminder
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- NOTES -->
+
+                                <div class="task-notes">
+
+                                    <textarea
+                                        id="note-{{ task.id }}"
+                                        placeholder="Add a note for this task..."
+                                    >{{ task.notes or '' }}</textarea>
+
+
+                                    <button
+                                        type="button"
+                                        class="save-note-button"
+                                        onclick="saveNote({{ task.id }})"
+                                    >
+                                        Save Note
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- =================================================
+             ACTION BUTTONS
+        ================================================== -->
+
+        <div class="plan-actions">
+
+            <a
+                href="/analytics"
+                class="analytics-button"
+            >
+                📊 View Analytics
+            </a>
+
+
+            <a
+                href="/"
+                class="new-plan-button"
+            >
+                + Create New Plan
+            </a>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    /* =====================================================
+       PROGRESS
+    ===================================================== */
+
+    function updateProgress() {
+
+        const checkboxes =
+            document.querySelectorAll(".task-checkbox");
+
+        const total =
+            checkboxes.length;
+
+        let completed = 0;
+
+
+        checkboxes.forEach(function (checkbox) {
+
+            if (checkbox.checked) {
+                completed++;
+            }
+
+        });
+
+
+        let percentage = 0;
+
+
+        if (total > 0) {
+
+            percentage =
+                Math.round(
+                    (completed / total) * 100
+                );
+
+        }
+
+
+        const progressBar =
+            document.getElementById(
+                "progressBar"
+            );
+
+
+        const progressPercentage =
+            document.getElementById(
+                "progressPercentage"
+            );
+
+
+        if (progressBar) {
+
+            progressBar.style.width =
+                percentage + "%";
+
+        }
+
+
+        if (progressPercentage) {
+
+            progressPercentage.textContent =
+                percentage + "%";
+
+        }
+
+    }
+
+
+    /* =====================================================
+       UPDATE TASK
+    ===================================================== */
+
+    function updateTask(checkbox) {
+
+        const taskId =
+            checkbox.getAttribute(
+                "data-task-id"
+            );
+
+
+        const completed =
+            checkbox.checked ? 1 : 0;
+
+
+        fetch("/update-task", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/x-www-form-urlencoded"
+            },
+
+            body:
+                "task_id=" +
+                encodeURIComponent(taskId) +
+                "&completed=" +
+                encodeURIComponent(completed)
+
+        })
+
+        .then(function (response) {
+
+            return response.text();
+
+        })
+
+        .then(function () {
+
+            updateProgress();
+
+        })
+
+        .catch(function (error) {
+
+            console.error(
+                "Task update error:",
+                error
+            );
+
+        });
+
+    }
+
+
+    /* =====================================================
+       UPDATE CONFIDENCE
+    ===================================================== */
+
+    function updateConfidence(select) {
+
+        const taskId =
+            select.getAttribute(
+                "data-task-id"
+            );
+
+
+        const confidence =
+            select.value;
+
+
+        fetch("/update-confidence", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/x-www-form-urlencoded"
+            },
+
+            body:
+                "task_id=" +
+                encodeURIComponent(taskId) +
+                "&confidence=" +
+                encodeURIComponent(confidence)
+
+        })
+
+        .then(function (response) {
+
+            return response.text();
+
+        })
+
+        .then(function (result) {
+
+            console.log(
+                "Confidence updated:",
+                result
+            );
+
+        })
+
+        .catch(function (error) {
+
+            console.error(
+                "Confidence update error:",
+                error
+            );
+
+        });
+
+    }
+
+
+    /* =====================================================
+       UPDATE ACTUAL HOURS
+    ===================================================== */
+
+    function updateActualHours(input) {
+
+        const taskId =
+            input.getAttribute(
+                "data-task-id"
+            );
+
+
+        const actualHours =
+            input.value;
+
+
+        fetch("/update-hours", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/x-www-form-urlencoded"
+            },
+
+            body:
+                "task_id=" +
+                encodeURIComponent(taskId) +
+                "&actual_hours=" +
+                encodeURIComponent(actualHours)
+
+        })
+
+        .then(function (response) {
+
+            return response.text();
+
+        })
+
+        .then(function (result) {
+
+            console.log(
+                "Actual hours updated:",
+                result
+            );
+
+        })
+
+        .catch(function (error) {
+
+            console.error(
+                "Actual hours update error:",
+                error
+            );
+
+        });
+
+    }
+
+
+    /* =====================================================
+       SAVE NOTE
+    ===================================================== */
+
+    function saveNote(taskId) {
+
+        const textarea =
+            document.getElementById(
+                "note-" + taskId
+            );
+
+
+        if (!textarea) {
+            return;
+        }
+
+
+        const notes =
+            textarea.value;
+
+
+        fetch("/save-note", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/x-www-form-urlencoded"
+            },
+
+            body:
+                "task_id=" +
+                encodeURIComponent(taskId) +
+                "&notes=" +
+                encodeURIComponent(notes)
+
+        })
+
+        .then(function (response) {
+
+            return response.text();
+
+        })
+
+        .then(function (result) {
+
+            console.log(
+                "Note saved:",
+                result
+            );
+
+        })
+
+        .catch(function (error) {
+
+            console.error(
+                "Note save error:",
+                error
+            );
+
+        });
+
+    }
+
+
+    /* =====================================================
+       SAVE REMINDER
+    ===================================================== */
+
+    function saveReminder(taskId) {
+
+        const startTime =
+            document.getElementById(
+                "start-time-" + taskId
+            ).value;
+
+
+        const reminderTime =
+            document.getElementById(
+                "reminder-time-" + taskId
+            ).value;
+
+
+        fetch("/save-reminder", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/x-www-form-urlencoded"
+            },
+
+            body:
+                "task_id=" +
+                encodeURIComponent(taskId) +
+                "&start_time=" +
+                encodeURIComponent(startTime) +
+                "&reminder_time=" +
+                encodeURIComponent(reminderTime) +
+                "&reminder_enabled=" +
+                encodeURIComponent(
+                    reminderTime ? 1 : 0
+                )
+
+        })
+
+        .then(function (response) {
+
+            return response.text();
+
+        })
+
+        .then(function (result) {
+
+            console.log(
+                "Reminder saved:",
+                result
+            );
+
+        })
+
+        .catch(function (error) {
+
+            console.error(
+                "Reminder save error:",
+                error
+            );
+
+        });
+
+    }
+
+
+    /* =====================================================
+       NOTIFICATIONS
+    ===================================================== */
+
+    function requestNotifications() {
+
+        if (!("Notification" in window)) {
+
+            alert(
+                "Your browser does not support notifications."
+            );
+
+            return;
+        }
+
+
+        Notification.requestPermission()
+
+            .then(function (permission) {
+
+                if (permission === "granted") {
+
+                    alert(
+                        "Notifications enabled!"
+                    );
+
+                }
+                else {
+
+                    alert(
+                        "Notifications were not enabled."
+                    );
+
+                }
+
+            });
+
+    }
+
+
+    /* =====================================================
+       ADAPTIVE STUDY PLAN
+    ===================================================== */
+
+    function adjustStudyPlan() {
+
+        const button =
+            document.querySelector(
+                ".adaptive-button"
+            );
+
+
+        const status =
+            document.getElementById(
+                "adaptive-status"
+            );
+
+
+        if (!button || !status) {
+            return;
+        }
+
+
+        const confirmed =
+            confirm(
+                "Redistribute all unfinished tasks across your remaining study days?"
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        button.disabled = true;
+
+        button.textContent =
+            "Adjusting...";
+
+        status.textContent = "";
+
+
+        fetch("/adaptive-adjust", {
+
+            method: "POST"
+
+        })
+
+        .then(function (response) {
+
+            return response.text();
+
+        })
+
+        .then(function (result) {
+
+            console.log(
+                "Adaptive adjustment:",
+                result
+            );
+
+
+            if (result === "no_plan") {
+
+                status.textContent =
+                    "No study plan found.";
+
+                button.disabled = false;
+
+                button.textContent =
+                    "🔄 Adjust My Plan";
+
+                return;
+            }
+
+
+            if (result === "no_active_day") {
+
+                status.textContent =
+                    "There is no active study day.";
+
+                button.disabled = false;
+
+                button.textContent =
+                    "🔄 Adjust My Plan";
+
+                return;
+            }
+
+
+            if (result === "no_remaining_days") {
+
+                status.textContent =
+                    "No remaining study days.";
+
+                button.disabled = false;
+
+                button.textContent =
+                    "🔄 Adjust My Plan";
+
+                return;
+            }
+
+
+            if (result === "all_complete") {
+
+                status.textContent =
+                    "All tasks are already complete.";
+
+                button.disabled = false;
+
+                button.textContent =
+                    "🔄 Adjust My Plan";
+
+                return;
+            }
+
+
+            if (result === "already_balanced") {
+
+                status.textContent =
+                    "Your remaining plan is already balanced.";
+
+                button.disabled = false;
+
+                button.textContent =
+                    "🔄 Adjust My Plan";
+
+                return;
+            }
+
+
+            if (result === "invalid_capacity") {
+
+                status.textContent =
+                    "Daily study capacity is invalid.";
+
+                button.disabled = false;
+
+                button.textContent =
+                    "🔄 Adjust My Plan";
+
+                return;
+            }
+
+
+            if (result.startsWith("adjusted|")) {
+
+                status.textContent =
+                    "Plan adjusted successfully. Reloading...";
+
+
+                setTimeout(function () {
+
+                    location.reload();
+
+                }, 700);
+
+
+                return;
+            }
+
+
+            if (
+                result.startsWith(
+                    "adjusted_over_capacity|"
+                )
+            ) {
+
+                status.textContent =
+                    "Plan adjusted, but the remaining workload is above your daily capacity. Reloading...";
+
+
+                setTimeout(function () {
+
+                    location.reload();
+
+                }, 900);
+
+
+                return;
+            }
+
+
+            status.textContent =
+                "Could not adjust the plan.";
+
+            button.disabled = false;
+
+            button.textContent =
+                "🔄 Adjust My Plan";
+
+        })
+
+        .catch(function (error) {
+
+            console.error(
+                "Adaptive adjustment error:",
+                error
+            );
+
+
+            status.textContent =
+                "Something went wrong. Please try again.";
+
+
+            button.disabled = false;
+
+            button.textContent =
+                "🔄 Adjust My Plan";
+
+        });
+
+    }
+
+
+    /* =====================================================
+       INITIAL PAGE LOAD
+    ===================================================== */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            updateProgress();
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>
